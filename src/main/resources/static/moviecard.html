@@ -1,0 +1,24 @@
+<div class="movierow">
+    <div class="movie-title-wrapper">
+        <div class="movie-title ">
+            {{movie.title}}
+        </div>
+    </div>
+    <div>
+        <div class="poster media">
+            <img class="media-object poster-picture" src="{{movie.posterUrl}}" height="80px" width="50px"/>
+            <div class="watchlist">
+                <a ng-click=""><i class="bookmark fa fa-bookmark"></i>
+                Add to Watchlist</a>
+            </div>
+        </div>
+
+        <div class="description">
+            <div class="plot lead">{{movie.plot}}</div>
+            <div class="moviecrew">
+                <strong>Director</strong>: {{movie.director}}
+                <br> <strong>Actors</strong>: {{movie.actors}}
+            </div>
+        </div>
+    </div>
+</div>

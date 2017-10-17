@@ -1,4 +1,4 @@
-package com.example.angspringsec;
+package com.example.eurekamoviehouse;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -7,7 +7,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest
-public class AngspringsecApplicationTests {
+public class EurekaMovieHouseApplicationTests {
 
 	@Test
 	public void contextLoads() {

@@ -1,0 +1,219 @@
+.search-panel{
+    height: 110px;
+    background-color: black;
+    background: linear-gradient(to bottom, #cadb15, orange);
+    border-radius: 5px;
+    margin-top: 20px;
+    overflow: hidden;
+    display: flex;
+    justify-content: flex-start;
+    flex-direction: row;
+}
+
+.moviehouse{
+    font-family: san-serif;
+    font-size: 20px;
+    padding-left: 10px;
+    border: thin solid red;
+    white-space: nowrap;
+}
+
+.moviehouse span{
+    line-height: 110px;
+}
+
+.searchbox{
+    line-height: 110px;
+    border: thin solid red;
+    display: table;
+}
+
+.registerform{
+  a{
+      color: black;
+  }
+  a:before{
+      content: "fuck yall <_>";
+  }
+  a:hover{
+      text-decoration: none;
+  }
+  button{
+      background-color: #cadb15;
+      margin-left: 10px;
+  }
+  input{
+      width: 80px;
+  }
+}
+
+.login{
+    line-height: 110px;
+    display: flex;
+    flex-direction: flex-end;
+    a{
+        color: black;
+    }
+    a:hover{
+        text-decoration: none;
+    }
+}
+
+.searchbox input[type="search"]{
+    margin-left: 20px;
+    margin-right: 20px;
+    height: 30px;
+    width: 350px;
+    border-radius: 5px;
+    vertical-align: middle;
+}
+
+@media(max-width: 900px){
+    .searchbox input[type="search"]{
+        width: 150px;
+    }
+    .search-panel{
+        flex-direction: column;
+        height: 150px;
+    }
+    .searchbox{
+        line-height: 50px;
+    }
+    .moviehouse span{
+        line-height: 50px;
+    }
+    .login{
+        line-height: 50px;
+    }
+    .movierow{
+        width: 300px;
+        height: 350px;
+        overflow: scroll;
+    }
+}
+.clickable{
+    cursor: pointer;
+}
+.searchbutton i{
+    cursor: pointer;
+    color: black;
+}
+
+.headline img{
+    height: 70px;
+    width: 125px;
+}
+
+// ---------------------
+.dropdown{
+    position: relative;
+    display: inline-block;
+    overflow: visible;
+}
+
+.dropdown-content{
+    display: none;
+    position: absolute;
+    background-color: white;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+    li{
+        text-indent: 15px;
+        line-height: 35px;
+        list-style: none;
+        white-space: nowrap;
+        &:hover{
+            background-color: rgb(245, 246, 247);
+        }
+    }
+}
+
+//!-- movieCard  --- //
+div.poster{
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+.poster img{
+    margin-top: 15px;
+    width: 50px;
+    height: 80px;
+}
+
+.movierow {
+    margin-top: 15px;
+    width: 600px;
+    height: 300px;
+    overflow: hidden;
+}
+
+.poster {
+    float: left;
+    display: flex;
+    flex-direction: column;
+}
+
+.bookmark {
+    float: left;
+}
+
+.movie-title-wrapper {
+    color: white;
+    background-color: #cadb15;
+    overflow: hidden;
+    height: 50px;
+    padding: 5% 0;
+}
+
+.movie-title-item {
+    margin-top: 10px;
+    margin-down: 10px;
+    height: auto;
+    text-align: center;
+}
+
+.movie-title {
+    font-size: 20px;
+    text-align: center;
+}
+
+.description {
+    overflow: hidden;
+    padding: 1em 1em;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+.plot{
+    font-size: 15px;
+}
+
+i{
+    padding-top: 5px;
+    margin-right: 5px;
+}
+
+.watchlist{
+    font-size: 15px;
+}
+
+.moviecrew{
+    font-size: 15px;
+}
+
+//----------
+.form-container{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    border: thin solid red;
+}
+
+@font-face {
+    src: url("font/fontawesome-webfont.woff");
+    src: url("font/glyphicons-halflings-regular.woff");
+}
+

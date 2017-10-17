@@ -1,8 +1,8 @@
-<h1>Greeting</h1>
 <div ng-show="authenticated">
-    <p>The ID is {{controller.greeting.id}}</p>
-    <p>The content is {{controller.greeting.content}}</p>
+    <p>The ID is {{controller.credentials.username}}</p>
+    <p>The content is {{controller.credentials.password}}</p>
 </div>
-<div ng-show="authenticated">
-    <p>Login to see your greeting</p>
+
+<div ng-repeat="movie in controller.movies">
+    <movie-card movie="movie"></movie-card>
 </div>
