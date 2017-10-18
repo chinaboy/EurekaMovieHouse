@@ -16,24 +16,13 @@ import org.apache.tomcat.dbcp.dbcp.ConnectionFactory;
 import org.apache.tomcat.dbcp.dbcp.PoolingDataSource;
 
 import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
-import org.apache.mahout.cf.taste.model.DataModel;
-//import org.apache.mahout.cf.taste.impl.model.file.FileDataModel;
-//import org.apache.mahout.cf.taste.similarity.UserSimilarity;
-import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
 
 import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
-import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer;
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
@@ -53,9 +42,6 @@ import java.sql.PreparedStatement;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.Future;
-import java.sql.Timestamp;
-
 
 import org.apache.lucene.document.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
@@ -107,7 +93,6 @@ public class EurekaMovieHouseApplication {
 			userExistsPs.setString(1, profile.getUsername());
 			ResultSet rs = userExistsPs.executeQuery();
 			if(rs.next()){
-				//id = rs.getInt("id");
 				return -1;
 			}
 
@@ -195,7 +180,6 @@ public class EurekaMovieHouseApplication {
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
 				id = rs.getInt("id");
-//				id = 10;
 				break;
 			}
 			if( id > 0 ) {
@@ -348,7 +332,6 @@ public class EurekaMovieHouseApplication {
 		doc.add(new StringField("producer", producer, Field.Store.YES));
 		doc.add(new StringField("actors", actors, Field.Store.YES));
 		doc.add(new StoredField("id", id));
-//		log.info(title + ", " + producer + ", " + actors + ",  " + Integer.toString(id) );
 		w.addDocument(doc);
 	}
 
@@ -375,29 +358,12 @@ public class EurekaMovieHouseApplication {
 					""
 			);
 
-			//UserSimilarity similarity = new PearsonCorrelationSimilarity(model);
-			//UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.9, similarity, model);
-			//recommender = new GenericUserBasedRecommender(model, neighborhood, similarity);
-
-			ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
 			recommender = new SVDRecommender(model, new ALSWRFactorizer(model, 10, 0.8, 100));
-
-//			log.info("user 9 has " + model.getPreferencesFromUser(9).getIDs().length + " preferences");
-//			log.info("finish building a recommendation model...");
-//			List<RecommendedItem> recommendations = recommender.recommend(9, 1);
-//			if(recommendations.size() != 0){
-//				for (RecommendedItem recommendation : recommendations) {
-//					log.info("recommend item " + recommendation.getItemID());
-//				}
-//			}else{
-//				log.info("not a single recommendation for user 9");
-//			}
 
 			analyzer = new StandardAnalyzer();
 			index = new RAMDirectory();
 			config = new IndexWriterConfig(analyzer);
 			w = new IndexWriter(index, config);
-
 
 			Connection conn = dataSource.getConnection();
 			PreparedStatement ps = conn.prepareStatement("select id, omdb_title, director, actors from movies");
