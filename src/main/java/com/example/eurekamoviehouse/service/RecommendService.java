@@ -2,10 +2,10 @@ package com.example.eurekamoviehouse.service;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 import org.apache.mahout.cf.taste.common.TasteException;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.Recommender;
+import org.apache.tomcat.dbcp.dbcp.PoolingDataSource;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,9 +17,6 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
-import org.apache.tomcat.dbcp.dbcp.PoolingDataSource;
-
-
 /**
  * Created by zhouqiang on 10/11/17.
  */
@@ -30,11 +27,7 @@ public class RecommendService {
 
 
     public RecommendService() {
-
         executor = Executors.newSingleThreadExecutor();
-
-
-
     }
 
     /*

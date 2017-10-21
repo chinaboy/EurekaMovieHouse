@@ -16,7 +16,6 @@ import org.apache.tomcat.dbcp.dbcp.ConnectionFactory;
 import org.apache.tomcat.dbcp.dbcp.PoolingDataSource;
 
 import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
-
 import org.apache.mahout.cf.taste.recommender.Recommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer;
@@ -32,8 +31,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -42,6 +39,9 @@ import java.sql.PreparedStatement;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.*;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 
 import org.apache.lucene.document.*;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
