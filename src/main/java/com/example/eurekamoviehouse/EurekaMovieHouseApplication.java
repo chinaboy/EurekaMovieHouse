@@ -4,9 +4,9 @@ import com.example.eurekamoviehouse.dao.search.SearchQuery;
 import com.example.eurekamoviehouse.dao.movie.Movie;
 import com.example.eurekamoviehouse.dao.user.UserProfile;
 import com.example.eurekamoviehouse.dao.movie.Rating;
-import com.example.eurekamoviehouse.service.RecommendFutureItem;
-import com.example.eurekamoviehouse.service.RecommendService;
 
+import com.example.eurekamoviehouse.service.RecommendList;
+import com.example.eurekamoviehouse.service.UserIdWrapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.apache.tomcat.dbcp.dbcp.DriverManagerConnectionFactory;
@@ -16,15 +16,11 @@ import org.apache.tomcat.dbcp.dbcp.ConnectionFactory;
 import org.apache.tomcat.dbcp.dbcp.PoolingDataSource;
 
 import org.apache.mahout.cf.taste.impl.model.jdbc.PostgreSQLJDBCDataModel;
-import org.apache.mahout.cf.taste.recommender.Recommender;
-import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.svd.ALSWRFactorizer;
-import org.apache.mahout.cf.taste.common.TasteException;
-import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.web.bind.annotation.*;
@@ -35,6 +31,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import javax.annotation.PostConstruct;
+import javax.ws.rs.FormParam;
 import java.sql.PreparedStatement;
 import java.io.IOException;
 import java.sql.SQLException;
@@ -57,6 +54,7 @@ import org.apache.lucene.search.ScoreDoc;
 import org.apache.lucene.search.TopDocs;
 import org.apache.lucene.store.Directory;
 import org.apache.lucene.store.RAMDirectory;
+import org.springframework.web.client.RestTemplate;
 
 
 @SpringBootApplication
@@ -73,11 +71,8 @@ public class EurekaMovieHouseApplication {
 
 	private Log log = LogFactory.getLog(EurekaMovieHouseApplication.class);
 
-	Recommender recommender;
-	PostgreSQLJDBCDataModel model;
-	RecommendService recommendService;
-
-	List<RecommendFutureItem> queue;
+	private PostgreSQLJDBCDataModel model;
+	private RestTemplate recommendClient;
 
 	@RequestMapping(value="/register", method = RequestMethod.POST)
 	@ResponseBody
@@ -118,8 +113,7 @@ public class EurekaMovieHouseApplication {
 		return -1;
 	}
 
-	protected List<Movie> getMovieByID(String idString){
-		List<Movie> result = new LinkedList<Movie>();
+	protected List<Movie> getMovieByID(String idString, List<Movie> result){
 		try {
 			Connection conn = dataSource.getConnection();
 			PreparedStatement ps = conn.prepareStatement(
@@ -145,55 +139,65 @@ public class EurekaMovieHouseApplication {
 	@RequestMapping(value="/recommend/{id}", method = RequestMethod.GET)
 	@ResponseBody
 	public List<Movie> recommend(@PathVariable("id") long id){
- 		try {
-			log.info("recommend for user with an id of " + id);
-			List<RecommendedItem> recommendations = recommender.recommend(id, 10);
-			if(recommendations.size() == 0){
-				return null;
-			}
-			String movieQuery = "";
-			for (RecommendedItem recommendation : recommendations) {
-				log.info(recommendation);
-				movieQuery += recommendation.getItemID() + ",";
-			}
-			log.info("query to select movies with ID of " + movieQuery );
-			movieQuery = movieQuery.substring(0, movieQuery.length() - 1);
-			return getMovieByID(movieQuery);
-		} catch(TasteException e){
-			log.info( e.getMessage() );
+		List<Movie> result = new LinkedList<Movie>();
+		log.info("recommend for user with an id of " + id);
+		RecommendList recommendList = recommendClient.getForObject("http://127.0.0.1:1111/eureka/", RecommendList.class);
+		if( recommendList == null || recommendList.empty() ){
+			return result;
 		}
-		return null;
+		return getMovieByID( recommendList.getMovieIdList(), result );
 	}
 
 	@RequestMapping(value="/authenticate", method = RequestMethod.POST)
 	@ResponseBody
-	public boolean authenticate(@RequestBody String content){
+	public int authenticate(@RequestBody String content){
 		ObjectMapper mapper = new ObjectMapper();
+		int uid=-1;
 		try {
 			UserProfile profile = mapper.readValue(content, UserProfile.class);
 			log.info( "authenticate user profile with name of " + profile.getUsername() + " and password of " + profile.getPassword() );
 			Connection conn = dataSource.getConnection();
-			PreparedStatement ps = conn.prepareStatement("SELECT username FROM users WHERE password=? AND username=?");
+			PreparedStatement ps = conn.prepareStatement("SELECT id FROM users WHERE password=? AND username=?");
 			ps.setString( 1, profile.getPassword() );
 			ps.setString( 2, profile.getUsername() );
-			int id=-1;
+
 			ResultSet rs = ps.executeQuery();
 			while(rs.next()){
-				id = rs.getInt("id");
+				uid = rs.getInt("id");
 				break;
 			}
-			if( id > 0 ) {
-				return true;
-			}else{
-				return false;
-			}
+
 		} catch(IOException e){
 			log.info( e.getMessage() );
 		} catch(SQLException e){
 			log.info( e.getMessage() );
+		}finally {
+			return uid;
 		}
+
+	}
+
+	private String generateSalt(){
+		return "123";
+	}
+
+	private boolean checkUserExists(String username){
 		return false;
 	}
+
+	@ResponseStatus(value = HttpStatus.FORBIDDEN, reason = "username is taken")
+	public class UserExistsException extends RuntimeException {
+
+	}
+
+//	@RequestMapping(value="/register", method = RequestMethod.POST)
+//	public int register(@FormParam("username") String username, @FormParam("password") String password){
+//		if(checkUserExists(username))
+//			throw new UserExistsException();
+//		//User.createUser(username, password, generateSalt());
+//
+//		return -1;
+//	}
 
 	@Configuration
 	@EnableWebSecurity
@@ -232,9 +236,10 @@ public class EurekaMovieHouseApplication {
 		return null;
 	}
 
-	@RequestMapping(value="/rateMovies", method=RequestMethod.POST)
+	@RequestMapping(value="/ratemovie", method=RequestMethod.POST)
 	public boolean rateMovies(@RequestBody String movieRatings){
 		ObjectMapper mapper = new ObjectMapper();
+		log.info("in function rateMovies()");
 		try {
 			Connection conn = dataSource.getConnection();
 			PreparedStatement addRatingPS = conn.prepareStatement("INSERT INTO ratings (userid, movieid, rating) VALUES (?, ?, ?)");
@@ -257,8 +262,9 @@ public class EurekaMovieHouseApplication {
 					if(recResult.next()){
 						int recCount = Integer.parseInt( recResult.getString("reccount"));
 						if(recCount == 0){
-							// kick off a new thread to generate recommendations
-							recommendService.recommendForUser(recommender, dataSource, rating.getUserid(), 10, queue );
+							// use client to interface with recommendation server
+							// user id is coded into the url
+							recommendClient.postForObject("", (Object)(new UserIdWrapper(rating.getUserid())), RecommendList.class );
 						}
 					}
 				}
@@ -266,8 +272,6 @@ public class EurekaMovieHouseApplication {
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 		return true;
@@ -358,8 +362,6 @@ public class EurekaMovieHouseApplication {
 					""
 			);
 
-			recommender = new SVDRecommender(model, new ALSWRFactorizer(model, 10, 0.8, 100));
-
 			analyzer = new StandardAnalyzer();
 			index = new RAMDirectory();
 			config = new IndexWriterConfig(analyzer);
@@ -377,11 +379,11 @@ public class EurekaMovieHouseApplication {
 			}
 			w.close();
 			conn.close();
+
+			recommendClient = new RestTemplate();
 		} catch (IOException e) {
 			log.error("IOException while set up lucene index");
 		} catch (SQLException e) {
-			e.printStackTrace();
-		} catch (TasteException e) {
 			e.printStackTrace();
 		}
 	}

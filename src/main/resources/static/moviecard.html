@@ -11,8 +11,11 @@
                 <a ng-click=""><i class="bookmark fa fa-bookmark"></i>
                 Add to Watchlist</a>
             </div>
+            <form ng-submit="rateMovie.postMovieByUser($rootScope.uid, movie.id, rateVal)">
+                <input type="range" min="1" max="5" step="1" ng-model="rateVal" />{{rateVal}}
+                <input type="submit" value="rate" />
+            </form>
         </div>
-
         <div class="description">
             <div class="plot lead">{{movie.plot}}</div>
             <div class="moviecrew">

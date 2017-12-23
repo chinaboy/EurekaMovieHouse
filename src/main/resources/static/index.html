@@ -1,7 +1,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>Hello AngularJS</title>
+    <title>Eureka Movie House</title>
     <link href="css/bootstrap.min.css" rel="stylesheet">
     <link href="css/font-awesome.min.css" rel="stylesheet">
     <link href="css/my.css" rel="stylesheet">
@@ -14,10 +14,10 @@
 </head>
 
 <body ng-app="hello" ng-cloak class="ng-cloak">
-<div class="container-fluid">
-    <div class="row headline">
-        <div class="col-offset-2 col-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 col-sm-offset-2 col-sm-8 ">
-            <nav class="search-panel" ng-controller="navigation as nav">
+    <div class="container-fluid">
+        <div class="row headline">
+            <div class="col-offset-2 col-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 col-sm-offset-2 col-sm-8 ">
+                <nav class="search-panel" ng-controller="navigation as nav">
                     <div class="moviehouse">
                         <span>Movie House</span>
                     </div>
@@ -43,16 +43,16 @@
                             <li><a ng-click="nav.logout()">Logout</a></li>
                         </ul>
                     </div>
-            </nav>
+                </nav>
+            </div>
+        </div>
+
+        <div class="col-offset-2 col-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 col-sm-offset-2 col-sm-8 ">
+            <main>
+                <div ng-view class="container"></div>
+            </main>
         </div>
     </div>
-
-    <div class="col-offset-2 col-8 col-md-offset-2 col-md-8 col-lg-offset-2 col-lg-8 col-sm-offset-2 col-sm-8 ">
-        <main>
-            <div ng-view class="container"></div>
-        </main>
-    </div>
-</div>
 
     <script src="js/jquery-3.2.1.min.js" type="text/javascript"></script>
     <script src="js/tether.min.js"></script>
@@ -60,7 +60,6 @@
     <script src="js/angular.min.js" type="text/javascript"></script>
     <script src="js/angular-route.min.js" type="text/javascript"></script>
     <script src="js/ui-bootstrap-2.5.0.min.js" type="text/javascript"></script>
-
     <script src="js/hello.js"></script>
 </body>
 </html>
